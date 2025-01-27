@@ -11,9 +11,8 @@ const renderSong = (playlistName, song) => {
       <p>Artist: ${song.artist}</p>
       <p>Genre: ${song.genre}</p>
       <p>Duration: ${song.duration}</p>
-      ${song.favorite ? '<p>One of my favorites</p>' : `
-        <button class="favorite-song" data-playlist="${playlistName}" data-id="${song.title}">Favorite</button>
-      `}
+      ${song.favorite ? '<p>One of my favorites</p>' : ``}
+      <button class="favorite-song" data-playlist="${playlistName}" data-id="${song.title}">Favorite</button>
       <button class="remove-song" data-playlist="${playlistName}" data-id="${song.title}">Remove</button>
     </div>
   `;
