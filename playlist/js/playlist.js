@@ -78,9 +78,15 @@ const musicCatalog = () => {
      * @throws {Error} If the playlist or song is not found.
      */
     const removeSongFromPlaylist = (playlistName, title) => {
-      playlists = playlists.map(playlist => playlist.name === playlistName 
-        ? {...playlist, songs: playlist.songs.filter(song => song.title !== title)}
-        : playlist)
+      playlists = playlists.map(playlist => {
+        if (playlist.name === playlistName) {
+          return {
+              ...playlist,
+              songs: playlist.songs.filter(song => song.title !== title)
+          };
+        }
+        return playlist
+      })
 
     };
   
@@ -90,15 +96,23 @@ const musicCatalog = () => {
      * @param {string} title - The title of the song to mark as a favorite.
      */
     const favoriteSong = (playlistName, title) => {
-      playlists = playlists.map(playlist => playlist.name === playlistName
-        ? {...playlist, 
-          songs: playlist.songs.map(song => song.title === title
-            ? {...song, favorite: !song.favorite}
-            : song
-          )
+      playlists = playlists.map(playlist => {
+        if (playlist.name === playlistName) {
+            return {
+                ...playlist,
+                songs: playlist.songs.map(song => {
+                    if (song.title === title) {
+                        return { 
+                            ...song, 
+                            favorite: !song.favorite 
+                        }
+                    }
+                    return song;
+                })
+            }
         }
-        : playlist
-      )
+        return playlist;
+      })
     };
   
     /**
@@ -108,7 +122,34 @@ const musicCatalog = () => {
      * @returns {Song[]} The list of sorted songs.
      * @throws {Error} If the playlist is not found or the criterion is invalid.
      */
-    const sortSongs = (playlistName, criterion) => {};
+    const sortSongs = (playlistName, criterion) => {
+      const validCriteria = ['title', 'artist', 'duration']
+      if (!validCriteria.includes(criterion)) {
+        throw new Error(`Criterio inválido: "${criterion}". Los criterios válidos son: ${validCriteria.join(', ')}`)
+      }
+      
+      const playlist = playlists.find(playlist => playlist.name === playlistName)
+      if (!playlist) {
+        throw new Error(`No se encuentra la playlist "${playlistName}". Prueba otra vez.`)
+      }
+
+      const sortedSongs = [...playlist.songs].sort((current, next) => {
+        if (criterion === 'duration') {
+          return parseInt(current[criterion]) - parseInt(next[criterion])
+        }
+        return current[criterion].localeCompare(next[criterion])
+      })
+      
+      playlists = playlists.map(playlist => {
+        if (playlist.name === playlistName) {
+          return {
+            ...playlist,
+            songs: sortedSongs
+          }  
+        }
+        return playlist
+      })
+    };
   
     return { createPlaylist, addSongToPlaylist, removeSongFromPlaylist, sortSongs, getAllPlaylists, removePlaylist, favoriteSong };
   };
