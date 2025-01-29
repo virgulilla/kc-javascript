@@ -50,7 +50,7 @@ const musicCatalog = () => {
      * @param {string} playlistName - The name of the playlist to remove.
      */
       const removePlaylist = (playlistName) => {
-        playlists = playlists.filter(playlist => playlist.name !== playlistName)
+        playlists = playlists.filter(({name}) => name !== playlistName)
       };
   
     /**
@@ -60,15 +60,19 @@ const musicCatalog = () => {
      * @throws {Error} If the playlist is not found.
      */
     const addSongToPlaylist = (playlistName, song) => {      
-      const playlist = playlists.find(playlist => playlist.name === playlistName)
-      
-      if (!playlist) {
-        throw new Error(`No se encuentra la playlist ${playlistName}. Prueba otra vez`)        
+      try {
+        const foundPlaylistName = playlists.find(({name}) => name === playlistName)
+        
+        if (!foundPlaylistName) {
+          throw new Error(`No se encuentra la playlist ${playlistName}. Prueba otra vez`)        
+        }
+
+        song.favorite = false
+
+        foundPlaylistName.songs = [...foundPlaylistName.songs, song]
+      } catch(error) {
+        console.error(error.message)
       }
-
-      song.favorite = false
-
-      playlist.songs = [...playlist.songs, song]
     };
   
     /**
@@ -78,16 +82,28 @@ const musicCatalog = () => {
      * @throws {Error} If the playlist or song is not found.
      */
     const removeSongFromPlaylist = (playlistName, title) => {
-      playlists = playlists.map(playlist => {
-        if (playlist.name === playlistName) {
-          return {
-              ...playlist,
-              songs: playlist.songs.filter(song => song.title !== title)
-          };
+      try {
+        const foundPlaylistName = playlists.find(({name}) => name === playlistName)
+        if (!foundPlaylistName) {
+          throw new Error(`No se encuentra la playlist ${playlistName}. Prueba otra vez`)        
         }
-        return playlist
-      })
+        const foundSongName = foundPlaylistName.songs.find(song => song.title === title)
+        if (!foundSongName) {
+          throw new Error(`No se encuentra la canción ${title}. Prueba otra vez`)        
+        }
 
+        playlists = playlists.map(playlist => {
+          if (playlist.name === playlistName) {
+            return {
+                ...playlist,
+                songs: playlist.songs.filter(song => song.title !== title)
+            }
+          }
+          return playlist
+        })
+      } catch(error) {
+        console.error(error.message)
+      }
     };
   
     /**
@@ -107,11 +123,11 @@ const musicCatalog = () => {
                             favorite: !song.favorite 
                         }
                     }
-                    return song;
+                    return song
                 })
             }
         }
-        return playlist;
+        return playlist
       })
     };
   
@@ -123,32 +139,36 @@ const musicCatalog = () => {
      * @throws {Error} If the playlist is not found or the criterion is invalid.
      */
     const sortSongs = (playlistName, criterion) => {
-      const validCriteria = ['title', 'artist', 'duration']
-      if (!validCriteria.includes(criterion)) {
-        throw new Error(`Criterio inválido: "${criterion}". Los criterios válidos son: ${validCriteria.join(', ')}`)
-      }
-      
-      const playlist = playlists.find(playlist => playlist.name === playlistName)
-      if (!playlist) {
-        throw new Error(`No se encuentra la playlist "${playlistName}". Prueba otra vez.`)
-      }
+      try {
+        const validCriteria = ['title', 'artist', 'duration']
+        if (!validCriteria.includes(criterion)) {
+          throw new Error(`Criterio inválido: "${criterion}". Los criterios válidos son: ${validCriteria.join(', ')}`)
+        }
+        
+        const playlist = playlists.find(({name}) => name === playlistName)
+        if (!playlist) {
+          throw new Error(`No se encuentra la playlist "${playlistName}". Prueba otra vez.`)
+        }
 
-      const sortedSongs = [...playlist.songs].sort((current, next) => {
-        if (criterion === 'duration') {
-          return parseInt(current[criterion]) - parseInt(next[criterion])
-        }
-        return current[criterion].localeCompare(next[criterion])
-      })
-      
-      playlists = playlists.map(playlist => {
-        if (playlist.name === playlistName) {
-          return {
-            ...playlist,
-            songs: sortedSongs
-          }  
-        }
-        return playlist
-      })
+        const sortedSongs = [...playlist.songs].sort((current, next) => {
+          if (criterion === 'duration') {
+            return parseInt(current[criterion]) - parseInt(next[criterion])
+          }
+          return current[criterion].localeCompare(next[criterion])
+        })
+        
+        playlists = playlists.map(playlist => {
+          if (playlist.name === playlistName) {
+            return {
+              ...playlist,
+              songs: sortedSongs
+            }  
+          }
+          return playlist
+        })
+      } catch(error) {
+        console.error(error.message)
+      }
     };
   
     return { createPlaylist, addSongToPlaylist, removeSongFromPlaylist, sortSongs, getAllPlaylists, removePlaylist, favoriteSong };
