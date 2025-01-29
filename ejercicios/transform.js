@@ -30,14 +30,15 @@ const datos = [
 ]
 
 function getDesarrolladoresJavascript(datos) {
-    return datos.filter(desarrollador => desarrollador.habilidades.includes('JavaScript'))
+    //return datos.filter(({habilidades}) => habilidades.find(habilidad => habilidad === 'JavaScript'))
+    return datos.filter(({habilidades}) => habilidades.includes('JavaScript'))    
+    /* En https://perf.link/
+        el return devuelto con includes (850,560 ops/s) es el doble de rapido que con find (390,420 ops/s)  */
 }
 
 function getNombresProyectos(datos) {
-    const nombresDeProyectos = datos
-        .map(persona => persona.proyectos.map(p => p.nombre))
-        .reduce((acc, nombres) => acc.concat(nombres))
-    return nombresDeProyectos
+    return datos.map(({ proyectos }) => proyectos.map(({ nombre }) => nombre))
+        .reduce((acc, nombres) => acc.concat(nombres), []);
 }
 
 console.log(getDesarrolladoresJavascript(datos))
