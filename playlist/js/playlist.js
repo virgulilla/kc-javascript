@@ -52,6 +52,10 @@ const musicCatalog = () => {
       const removePlaylist = (playlistName) => {
         playlists = playlists.filter(({name}) => name !== playlistName)
       };
+
+      const getPlaylist = (playlistName) => {
+        return playlists.find(({name}) => name === playlistName)
+      }
   
     /**
      * Adds a song to a specific playlist.
@@ -61,15 +65,20 @@ const musicCatalog = () => {
      */
     const addSongToPlaylist = (playlistName, song) => {      
       try {
-        const foundPlaylistName = playlists.find(({name}) => name === playlistName)
+        const playlist = getPlaylist(playlistName)
         
-        if (!foundPlaylistName) {
+        if (!playlist) {
           throw new Error(`No se encuentra la playlist ${playlistName}. Prueba otra vez`)        
         }
 
         song.favorite = false
 
-        foundPlaylistName.songs = [...foundPlaylistName.songs, song]
+        playlists = playlists.map((playlistElem) => {
+          if (playlistElem.name === playlistName) {
+            return {...playlistElem, songs: [...playlistElem.songs, song] }
+          }
+          return playlistElem
+        })
       } catch(error) {
         console.error(error.message)
       }
@@ -83,12 +92,12 @@ const musicCatalog = () => {
      */
     const removeSongFromPlaylist = (playlistName, title) => {
       try {
-        const foundPlaylistName = playlists.find(({name}) => name === playlistName)
-        if (!foundPlaylistName) {
+        const playlist = getPlaylist(playlistName)
+        if (!playlist) {
           throw new Error(`No se encuentra la playlist ${playlistName}. Prueba otra vez`)        
         }
-        const foundSongName = foundPlaylistName.songs.find(song => song.title === title)
-        if (!foundSongName) {
+        const song = playlist.songs.find(song => song.title === title)
+        if (!song) {
           throw new Error(`No se encuentra la canción ${title}. Prueba otra vez`)        
         }
 
