@@ -5,7 +5,8 @@ const calcularPromedio = (numeros) => {
         al acceder al indice i en la ultima iteraccion devolveria un fuera de rango, dando
         como resultado un undefined  dando error en la variable de sumaTotal
     */
-    for (let i = 0; i <= numeros.length; i++) {
+   //for (let i = 0; i <= numeros.length; i++) {
+    for (let i = 0; i < numeros.length; i++) {
         sumaTotal += numeros[i];
     }
 
@@ -15,3 +16,4 @@ const calcularPromedio = (numeros) => {
 
 const listaNumeros = [1, 2, 3, 4, 5];
 const promedioNumeros = calcularPromedio(listaNumeros);
+console.log(promedioNumeros)
